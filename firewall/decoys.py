@@ -1,4 +1,4 @@
-"""Decoys (section 3.5). Fake actions no honest shopping task ever needs.
+"""Decoys. Fake actions no honest shopping task ever needs.
 
 If the agent reaches for one, something in the text it read hijacked it. We freeze the session and
 attribute it to the SOURCE OF THE TEXT. Text found in a customer review is attributed to the review on

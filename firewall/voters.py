@@ -1,4 +1,4 @@
-"""The three voting agents (section 3.4). Grey zone only.
+"""The three voting agents. Grey zone only.
 
 Voters NEVER see the product page. They see the user's goal, the proposed action (with source labels),
 and a short summary from Scamurai. That stops the same page from tricking the voters too.

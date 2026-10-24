@@ -1,4 +1,4 @@
-"""Run every setup against every task and score it (section 9 of the md).
+"""Run every setup against every task and score it.
 
     python -m eval.run_tests            # writes data/results.json, prints the scoreboard
     python -m eval.run_tests --fresh    # re-capture every page (honest timing for two views)

@@ -2,7 +2,7 @@
 
 Scamurai is a hackathon project (Hack-o-ween, PES University): an AI shopping agent with a built-in
 firewall against hidden text, bot-only pages, hidden commands, persuasion aimed at AI, and fake backup
-reviews. This repo is a working prototype. We are extending it during the hackathon on one laptop.
+reviews. We are building it during the hackathon on one laptop.
 
 Read `context/00_SHARED.md` for the architecture and the contract (`core/schema.py`). The current task
 file is in `context/` (start with `P1_REAL_LLM_AND_MEMORY.md`).

@@ -1,4 +1,4 @@
-"""Split a two-views capture into tagged claims (section 3.2 of the md)."""
+"""Split a two-views capture into tagged claims."""
 from __future__ import annotations
 
 import re

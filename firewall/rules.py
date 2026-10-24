@@ -1,4 +1,4 @@
-"""Rules that always block (section 3.4). No vote can overrule them. Plain code, unit tested."""
+"""Rules that always block. No vote can overrule them. Plain code, unit tested."""
 from __future__ import annotations
 
 from typing import Optional

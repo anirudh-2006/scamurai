@@ -1,4 +1,4 @@
-"""Source labels (section 3.3 of the md).
+"""Source labels.
 
 Deterministic provenance, NOT asked of the LLM (an LLM cannot reliably report where its own ideas came from):
 

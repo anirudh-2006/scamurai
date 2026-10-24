@@ -1,4 +1,4 @@
-"""Two views: capture every page twice (section 3.2 of the md).
+"""Two views: capture every page twice.
 
   Human view: what a real browser actually shows (Playwright, normal browser User-Agent).
   Agent view: everything a machine reads, fetched AS A BOT (raw HTML, hidden elements, alt text, metadata).

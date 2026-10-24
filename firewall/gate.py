@@ -1,4 +1,4 @@
-"""The gate: takes a proposed action, returns a decision (section 3.4).
+"""The gate: takes a proposed action, returns a decision.
 
 Order of checks:
   1. Decoy touched            -> freeze the session, name the source           (needs setup.decoys)

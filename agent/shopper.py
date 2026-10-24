@@ -1,4 +1,4 @@
-"""The shopper agent (section 3.1 of the md).
+"""The shopper agent.
 
 Two brains, same tools, same gate:
   run_mock(session) - deterministic gullible agent (agent/mock_brain.py)

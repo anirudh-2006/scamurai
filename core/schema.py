@@ -1,4 +1,4 @@
-"""The shared action format (section 5 of the md). Every part of the system speaks this.
+"""The shared action format. Every part of the system speaks this.
 
 Agree on this file first. Nobody changes it during the hackathon without telling the team.
 """

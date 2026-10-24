@@ -1,4 +1,4 @@
-"""The five setups from section 9 of the md. Protections are switched on one at a time."""
+"""The five setups. Protections are switched on one at a time."""
 from __future__ import annotations
 
 from dataclasses import dataclass
