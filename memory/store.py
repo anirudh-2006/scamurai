@@ -9,16 +9,20 @@ Trust only goes down automatically (min of stored and new); only forget() resets
 """
 from __future__ import annotations
 
+import re
 import sqlite3
 import time
 from pathlib import Path
 from typing import Optional
 
 from core.config import ROOT
+from firewall import decoys
 from views.claims import key, sentences
 
 DB = ROOT / "data" / "memory.db"
 MIN_FINGERPRINT = 20   # "Great phone!" must never match anything
+# A review block starts with its header: "★★★★★ DealsBot_Official : ". Never part of a fingerprint.
+_REVIEW_HEADER = re.compile(r"^\s*[★☆]+\s*[^:]{0,60}:\s*")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS threats(fingerprint TEXT PRIMARY KEY, text TEXT, kind TEXT, seller TEXT,
@@ -41,8 +45,13 @@ class Memory:
         self.db.executescript(SCHEMA)
 
     # ------------------------------------------------------------ learning
-    def _store(self, text: str, kind: str, seller: Optional[str], page_id: Optional[str], run_id) -> None:
-        for s in sentences(text):
+    def _store(self, text: str, kind: str, seller: Optional[str], page_id: Optional[str], run_id,
+               triggered_by=None) -> None:
+        """Store the sentences of `text` (review header stripped). With `triggered_by`, only the sentences it
+        accepts: the part of the block that actually caused the verdict, not the praise around it."""
+        for s in sentences(_REVIEW_HEADER.sub("", text)):
+            if triggered_by and not triggered_by(s):
+                continue
             fp = fingerprint(s)
             if fp:
                 self.db.execute("INSERT OR IGNORE INTO threats(fingerprint, text, kind, seller, page_id, run_id, hits) "
@@ -60,7 +69,8 @@ class Memory:
             if f.get("seller") and f.get("text"):
                 page_id = next((p["page_id"] for p in session.pages.values()
                                 if any(b["text"] == f["text"] for b in p["capture"].agent_blocks)), None)
-                self._store(f["text"], "decoy", f["seller"], page_id, run_id)
+                self._store(f["text"], "decoy", f["seller"], page_id, run_id,
+                            triggered_by=lambda s, d=f["decoy"]: decoys.mentions(d, s))
 
         # 2. Hidden or bot-only text found by the two views ("unverified" is too generic).
         for b in session.bait_found:
@@ -80,7 +90,8 @@ class Memory:
                     continue
                 for block in page["capture"].agent_blocks:
                     if key(d["value"]) in key(block["text"]):
-                        self._store(block["text"], "command", page["seller"], page["page_id"], run_id)
+                        self._store(block["text"], "command", page["seller"], page["page_id"], run_id,
+                                    triggered_by=lambda s, v=key(d["value"]): v in key(s))
 
         # 4. Trust never rises automatically.
         for seller, t in session.trust.items():

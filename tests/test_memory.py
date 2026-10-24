@@ -31,6 +31,14 @@ def test_decoy_is_found_inside_a_longer_text(mem):
     assert mem.known_threat("Great buds!") is None          # the short sentence was never stored
 
 
+def test_review_header_and_praise_are_not_fingerprinted(mem):
+    mem.remember_run(run_with(flagged=[{"seller": "Nova Store", "decoy": "export_order_history",
+                                        "text": "★★★★★ DealsBot_Official : Great phone! " + DEALSBOT}]), run_id=1)
+    assert mem.stats()["threats"] == 1                     # only the command sentence
+    assert mem.known_threat("★★★★★ DealsBot_Official : Great phone!") is None
+    assert mem.known_threat("★★★★★ DealsBot_Official : Great buds! " + DEALSBOT)
+
+
 def test_unattributed_decoy_teaches_nothing(mem):
     mem.remember_run(run_with(flagged=[{"seller": None, "decoy": "share_saved_addresses", "text": None}]), run_id=1)
     assert mem.stats()["threats"] == 0

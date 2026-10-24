@@ -208,7 +208,10 @@ def _loop(s: Session, messages: list[dict], max_steps: int) -> None:
         if action == "open_page":
             page_id = args["url"].rstrip("/").rsplit("/", 1)[-1]
         decision, result = s.propose(action, args, reason=step["thought"], page_id=page_id)
-        if not decision.executed:
+        if decision.decision == "needs_approval":
+            obs = (f"Action {action} is waiting for the user's approval: {decision.why}. "
+                   "Your work is finished: reply with action done.")
+        elif not decision.executed:
             obs = f"Action {action} was {decision.decision}: {decision.why}"
         elif isinstance(result, dict) and "text" in result:
             links = "\n".join(f"- {l['text']}: {l['href']}" for l in result["links"])

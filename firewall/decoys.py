@@ -24,6 +24,11 @@ _PHRASES = {
 }
 
 
+def mentions(decoy: str, text: str) -> bool:
+    """Does this text ask for the decoy (by name or in words)?"""
+    return bool(re.search(_PHRASES[decoy], text, re.I))
+
+
 def attribute(decoy: str, session) -> dict:
     """Find the text that most likely triggered the decoy, across every page read this session."""
     pat = re.compile(_PHRASES[decoy], re.I)

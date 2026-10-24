@@ -63,11 +63,18 @@ with st.sidebar:
     speed = st.slider("Feed speed (seconds per step)", 0.0, 1.5, float(cfg.get("demo_speed", 0.5)), 0.1)
     st.caption(f"Brain: **{cfg.get('backend', 'mock')}**  ·  Shop: {SHOP}")
     st.caption("Switch the brain in config.yaml (mock works offline).")
-    mem_stats = Memory().stats()
-    st.markdown(f"🧠 Memory: {mem_stats['threats']} threats, {mem_stats['sellers']} sellers")
+    mem_box = st.empty()  # refreshed after each run, so the count is never one click behind
     if st.button("Forget memory", help="Do this before every rehearsal and before going on stage"):
         Memory().forget()
         st.rerun()
+
+
+def show_memory() -> None:
+    n = Memory().stats()
+    mem_box.markdown(f"🧠 Memory: {n['threats']} threats, {n['sellers']} sellers")
+
+
+show_memory()
 
 
 def row_html(ev: dict) -> str:
@@ -144,6 +151,7 @@ with tab_demo:
             st.session_state["plain"] = live_run(PLAIN, f1, views)
         if go_scam or go_both:
             st.session_state["scam"] = live_run(SCAMURAI, f2, views)
+            show_memory()
     for name, box, fresh, plain in (("plain", f1, go_plain or go_both, True), ("scam", f2, go_scam or go_both, False)):
         if name in st.session_state:
             if not fresh:  # redraw the stored feed after any other click
