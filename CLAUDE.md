@@ -1,6 +1,6 @@
 # Scamurai: notes for Claude Code
 
-Scamurai is a hackathon project (Hack-o-ween, PES University): an AI shopping agent with a built-in
+Scamurai is a hackathon project: an AI shopping agent with a built-in
 firewall against hidden text, bot-only pages, hidden commands, persuasion aimed at AI, and fake backup
 reviews. We are building it during the hackathon on one laptop.
 

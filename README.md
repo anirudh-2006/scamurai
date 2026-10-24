@@ -1,6 +1,6 @@
 # Scamurai
 
-**An AI shopping agent with a firewall built in.** Built for Hack-o-ween at PES University.
+**An AI shopping agent with a firewall built in.**
 
 AI agents now read product pages and act on what they read: they add items to the cart, send your
 address and pay. Product pages are written by sellers, and some sellers write for the bot, not for you.
