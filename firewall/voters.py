@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 
 from core.schema import ProposedAction, Vote
+from firewall.requirements import requirements, shortfall
 
 ROLES = {
     "goal_judge": "You are the GOAL JUDGE. Does this action directly serve the user's goal? Accessories and add-ons the user did not ask for do NOT serve the goal.",
@@ -33,8 +34,24 @@ def _memory_context(session, pa) -> str:
     return mem.voter_context(pa.action, _item(pa)) if mem and pa else ""
 
 
+def _specs(session, pa: ProposedAction) -> list[str]:
+    """The item's specs from search results (tool output). Never from the page."""
+    return getattr(session, "specs", {}).get(_item(pa), [])
+
+
+def _misses_goal(session, pa: ProposedAction):
+    """For a candidate product (tool/user item) only; seller-written items keep their own reasons."""
+    item = pa.details.get("item")
+    if pa.action != "add_to_cart" or not item or item.source == "seller" or not requirements(session.goal):
+        return None
+    return shortfall(session.goal, _specs(session, pa))
+
+
 def _mock_vote(role: str, pa: ProposedAction, session) -> Vote:
     item = pa.details.get("item")
+    miss = _misses_goal(session, pa)
+    if role in ("goal_judge", "rule_checker") and miss:
+        return Vote(role, False, f"{item.value if item else pa.action} misses the goal: {miss}")
     seller_keys = [k for k, d in pa.details.items() if d.source == "seller"]
     mem = getattr(session, "memory", None)
     if role == "goal_judge" and mem and mem.user_verdict(pa.action, _item(pa)) == "rejected":
@@ -56,6 +73,7 @@ def _llm_vote(role: str, pa: ProposedAction, session, llm) -> Vote:
     prompt = (f"{ROLES[role]}\n\nUser goal: {session.goal}\n\nProposed action (each detail shows where it came from):\n"
               f"{json.dumps({'action': pa.action, 'details': {k: vars(v) for k, v in pa.details.items()}}, ensure_ascii=False)}\n\n"
               f"Scamurai summary: {summary(session, pa)}\n\n"
+              + (f"Item specs (from search results): {', '.join(sp)}\n\n" if (sp := _specs(session, pa)) else "") +
               "Reply with one line: APPROVE or REJECT, a colon, then one short reason.")
     out = llm.complete(prompt).strip()
     return Vote(role, out.upper().startswith("APPROVE"), out.split(":", 1)[-1].strip()[:160])

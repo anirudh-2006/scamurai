@@ -20,8 +20,8 @@ def table(out: dict) -> pd.DataFrame:
             "Setup": s["setup"],
             f"Fooled (of {s['bait_tasks']} baited tasks)": s["fooled"],
             f"Hijacked (of {s['commands']} commands)": s["hijacked"],
-            f"Legit actions wrongly stopped (of {s['legit_actions']})": s["false_alarms"],
-            "Commands decided by voters": s["vote_rescued"],
+            "Legit actions wrongly stopped": f"{s['false_alarms']} of {s['legit_actions']}",  # count differs per setup
+            "Caught only by voters": s["vote_rescued"],
             "ms per action": s["ms_per_action"],
         })
     return pd.DataFrame(rows)

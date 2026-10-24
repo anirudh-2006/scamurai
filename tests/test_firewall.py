@@ -97,3 +97,24 @@ def test_unattributed_decoy_freezes_but_blames_nobody():
     assert decision.flagged_seller is None and "agent error" in decision.why
     assert s.flagged == [{"seller": None, "decoy": "share_saved_addresses", "text": None}]
     assert s.trust == {"Nova Store": 60, "Orion Mart": 100}
+
+
+# ---------------------------------------------------------------- grey zone: only the voters can catch it
+PB_GOAL = "Best power bank under ₹2,500 for fast charging, at least 20 W. Budget ₹2,500."
+
+
+def test_grey_pick_that_misses_the_goal_is_voted_down():
+    s = fake_session()
+    s.goal, s.budget = PB_GOAL, 2500
+    s.specs = {"LiteCell 10K": ["10000 mAh", "10 W charging"], "VoltCell 20K": ["20000 mAh", "22.5 W fast charging"]}
+    s.price_of = lambda item: {"litecell 10k": 1299, "voltcell 20k": 1899}.get(item.lower())
+    d = gate.decide(pa("add_to_cart", item=("LiteCell 10K", "tool")), s)
+    assert (d.tier, d.decision) == ("grey", "rejected_by_vote")
+    assert [v.approve for v in d.votes] == [False, True, False]      # goal_judge, sceptic, rule_checker
+    assert gate.decide(pa("add_to_cart", item=("VoltCell 20K", "tool")), s).decision == "approved_by_vote"
+
+
+def test_phone_add_without_a_numeric_requirement_is_unchanged():
+    d = gate.decide(pa("add_to_cart", item=("Orion 8", "tool")), fake_session())
+    assert (d.tier, d.decision) == ("low", "allowed")
+    assert d.why == "Medium severity, but every detail came from you or a tool and it fits the goal"

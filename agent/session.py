@@ -45,6 +45,7 @@ class Session:
         self.user_texts = [goal]
         self.tool_outputs: list[str] = []
         self.prices: dict[str, int] = {}
+        self.specs: dict[str, list[str]] = {}  # from search results only (tool output), never from pages
         self.cart: list[tuple[str, int]] = []
         self.pages: dict[str, dict] = {}
         self.events: list[dict] = []
@@ -141,6 +142,7 @@ class Session:
             data = requests.get(f"{self.shop}/api/search", params={"q": args["query"]}, timeout=10).json()
             for r in data["results"]:
                 self.prices[r["name"]] = r["price"]
+                self.specs[r["name"]] = r.get("specs", [])
             self.tool_outputs.append(json.dumps(data["results"], ensure_ascii=False))
             return data["results"]
         if action == "open_page":

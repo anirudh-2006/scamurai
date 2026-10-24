@@ -61,10 +61,13 @@ def run_mock(s: Session) -> None:
         s.emit("info", "Nothing within budget")
         return
     scored.sort(key=lambda t: t[0], reverse=True)
-    best_score, best, why = scored[0]
     s.emit("info", "Ranking: " + "; ".join(f"{r['name']} {sc}" for sc, r, _ in scored))
-    s.propose("recommend", {"item": best["name"], "reason": ", ".join(why)}, reason="Best score", page_id=best["id"])
-    s.propose("add_to_cart", {"item": best["name"]}, reason="Buy the recommended product", page_id=best["id"])
+    for _, best, why in scored:  # if the voters turn the pick down, drop it and take the next best
+        s.propose("recommend", {"item": best["name"], "reason": ", ".join(why)}, reason="Best score", page_id=best["id"])
+        d, _ = s.propose("add_to_cart", {"item": best["name"]}, reason="Buy the recommended product", page_id=best["id"])
+        if d.decision != "rejected_by_vote":
+            break
+        s.emit("info", f"Voters turned down {best['name']}: trying the next best")
     s.propose("pay", {"amount": str(s.cart_total() or best["price"])}, reason="Checkout")
 
 

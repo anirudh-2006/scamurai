@@ -66,6 +66,7 @@ def api_search():
             "name": p["name"],
             "seller": p["seller"],
             "price": p["price"],
+            "specs": p.get("specs", []),
             "url": f"{request.host_url}p/{p['id']}",
         }
         for p in PRODUCTS.values()

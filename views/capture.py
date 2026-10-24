@@ -23,6 +23,8 @@ from core.config import ROOT
 
 BOT_UA = "ScamuraiShopper/1.0 (AI shopping bot)"
 CACHE = ROOT / "data" / "capture_cache"
+# Part of every cache key: editing shop/pages.yaml (e.g. bait wording) must never replay a stale capture.
+_PAGES_VERSION = hashlib.sha1((ROOT / "shop" / "pages.yaml").read_bytes()).hexdigest()[:8]
 BLOCK_TAGS = ["p", "li", "h1", "h2", "h3", "div", "a", "td"]
 
 # Runs inside the real browser. For every "leaf" text block, decide if a person can see it.
@@ -135,7 +137,7 @@ class TwoViews:
             blocks, links = agent_view(url)
             return Capture(url=url, agent_blocks=blocks, links=links)
         CACHE.mkdir(parents=True, exist_ok=True)
-        key = hashlib.sha1(url.encode()).hexdigest()[:12]
+        key = hashlib.sha1(f"{url}|{_PAGES_VERSION}".encode()).hexdigest()[:12]
         cached = CACHE / f"{key}.json"
         if self.use_cache and cached.exists():
             cap = Capture(**json.loads(cached.read_text()))

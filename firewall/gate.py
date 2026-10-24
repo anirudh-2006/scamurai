@@ -5,11 +5,14 @@ Order of checks:
   2. Fixed rules              -> block or send to you, no vote can overrule    (needs setup.firewall)
   3. Source check             -> seller-sourced key detail: high = block, medium = vote   (needs setup.source_labels)
   4. Severity + goal fit      -> low runs, medium that fits the goal runs, else vote / ask you   (needs setup.firewall)
+                                 an add_to_cart against a goal with a numeric requirement ("at least 20 W") goes to
+                                 the voters even when every detail is tool/user: the grey zone labels can't see
 """
 from __future__ import annotations
 
 from core.schema import KEY_FIELDS, Decision, ProposedAction
 from firewall import decoys, rules, voters
+from firewall.requirements import describe, requirements
 from firewall.severity import severity
 
 
@@ -66,6 +69,10 @@ def decide(pa: ProposedAction, session) -> Decision:
         if sev == "medium":
             item = pa.details.get("item")
             if item and item.source in ("tool", "user"):
+                reqs = requirements(session.goal)
+                if pa.action == "add_to_cart" and reqs and s.voters and not seller_keys:
+                    # Source labels can't help here: everything is tool/user. Does the item meet the goal?
+                    return _vote(pa, session, f"Every detail came from you or a tool, but the goal asks for {describe(reqs)}")
                 return Decision("low", "allowed", "Medium severity, but every detail came from you or a tool and it fits the goal")
             if s.voters:
                 return _vote(pa, session, "Medium severity and goal fit unclear")
