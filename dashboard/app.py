@@ -82,8 +82,8 @@ def row_html(ev: dict) -> str:
         b = ev["bait"]
         reason = f" ({b['reason']})" if b.get("reason") else ""
         if b["tag"] == "known":
-            return (f"<div class='row bait'>👻 <b>KNOWN</b> on {b['page_id']}: “{html.escape(b['text'])}”"
-                    f"<div class='why'>{html.escape(b['reason'] or '')}</div></div>")
+            return (f"<div class='row bait'>👻 <b>KNOWN</b> on {b['page_id']}: {html.escape(b['reason'] or '')}"
+                    f"<div class='why'>Removed before the agent read it: “{html.escape(b['text'])}”</div></div>")
         return (f"<div class='row bait'>👻 <b>{b['tag'].upper()}</b> on {b['page_id']}: "
                 f"“{html.escape(b['text'])}”<div class='why'>Ignored{reason}</div></div>")
     if ev["kind"] == "info":
