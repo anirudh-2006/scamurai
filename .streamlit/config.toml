@@ -1,8 +1,11 @@
 # Dashboard theme: black and crimson. Read when you run `streamlit run dashboard/app.py` from the repo root.
+# Fonts load from Google Fonts; offline they fall back to the system sans-serif and monospace.
 [theme]
 base = "dark"
 primaryColor = "#e0242f"
 backgroundColor = "#09090b"
 secondaryBackgroundColor = "#17141a"
 textColor = "#f3ece2"
-font = "sans serif"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap, sans-serif"
+headingFont = "'Zen Kaku Gothic New':https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap, sans-serif"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap, monospace"

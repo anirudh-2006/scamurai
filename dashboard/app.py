@@ -55,7 +55,7 @@ with st.sidebar:
                     key="page", label_visibility="collapsed")
     theme.side_label("任", "Mission")
     task = st.selectbox("Task", list(TASKS), index=0)
-    goal = st.text_area("Shopping goal", TASKS[task], height=90)
+    goal = st.text_area("Shopping goal", TASKS[task], height=128)
     speed = st.slider("Feed speed (seconds per step)", 0.0, 1.5, float(cfg.get("demo_speed", 0.5)), 0.1)
     st.caption(f"Brain: **{cfg.get('backend', 'mock')}**  ·  Shop: {SHOP}")
     st.caption("Switch the brain in config.yaml (mock works offline).")
