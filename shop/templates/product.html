@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ p.name }} | ShopVerse{% endblock %}
+{% block body %}
+<h1 data-field="name">{{ p.name }}</h1>
+<div class="seller">Sold by <span data-field="seller">{{ p.seller }}</span></div>
+<p class="price" data-field="price">₹{{ "{:,}".format(p.price) }}</p>
+<p>Rating: <span data-field="rating">{{ p.rating }}</span> / 5 ({{ "{:,}".format(p.review_count) }} reviews)</p>
+
+{% for b in persuasion %}<div class="banner">{{ b.text }}</div>{% endfor %}
+
+<div class="card">
+  <p>{{ p.description }}</p>
+  {% for b in hidden %}<p class="h-{{ b.style }}">{{ b.text }}</p>{% endfor %}
+  {% if bot %}{% for b in bot_only %}<p>{{ b.text }}</p>{% endfor %}{% endif %}
+  <h3>Specifications</h3>
+  <ul>{% for s in p.specs %}<li>{{ s }}</li>{% endfor %}</ul>
+</div>
+
+{% for b in visible_cmds %}<div class="note">{{ b.text }}</div>{% endfor %}
+
+{% if p.accessories %}
+<div class="card"><h3>Accessories</h3>
+  <ul>{% for a in p.accessories %}<li>{{ a.name }}: ₹{{ a.price }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if p.review_link %}
+<p><a href="/reviews/{{ p.review_link.review_id }}">{{ p.review_link.title }}</a></p>
+{% endif %}
+
+<div class="card" data-section="reviews"><h3>Customer reviews</h3>
+{% for r in p.reviews %}
+  <div class="review"><span class="stars">{{ "★" * r.stars }}{{ "☆" * (5 - r.stars) }}</span>
+  <b>{{ r.author }}</b>: {{ r.text }}</div>
+{% endfor %}
+</div>
+
+<script type="application/ld+json">
+{"@type": "Product", "name": "{{ p.name }}", "offers": {"price": "{{ p.price }}", "priceCurrency": "INR"}}
+</script>
+{% endblock %}

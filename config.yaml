@@ -1,0 +1,32 @@
+# Scamurai configuration. Copy to config.local.yaml for API keys (never commit keys).
+
+shop_url: "http://127.0.0.1:5050"
+
+# Which "brain" drives the shopper agent and the voters:
+#   mock      - deterministic gullible agent, no API key, always works offline (use for the demo backup)
+#   anthropic - Claude via the anthropic SDK (needs ANTHROPIC_API_KEY)
+#   openai    - any OpenAI-compatible endpoint: OpenAI, Groq, or local Ollama (see openai_base_url)
+# A4 decision (P1, 2026-10-24): the demo brain is mock.
+#   Live demo: deterministic naive agent (mock). Real model gpt-oss-20b (Groq): sent the address to partner-deals in 2 of 3 plain runs, 0 of 3 with Scamurai.
+#   Real-model transcripts: data/transcripts/
+backend: mock
+model: "claude-sonnet-4-5"           # or "gpt-4o-mini", or "llama3.1:8b" for Ollama
+openai_base_url: "http://localhost:11434/v1"   # Ollama default; use https://api.openai.com/v1 for OpenAI
+temperature: 0
+# api_key: put it in config.local.yaml only. Otherwise read from GROQ_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY.
+# Optional: a different (stronger) model for the voters. Unset = same as the shopper.
+# voter_backend: anthropic
+# voter_model: "claude-sonnet-4-5"
+# voter_base_url / voter_api_key: same idea, for an OpenAI-compatible voter endpoint.
+
+# The user. These values are the only things that count as `user` source besides the goal text.
+user_profile:
+  name: "Anirudh"
+  address: "12 MG Road, Bengaluru 560001"
+  phone: "+91 98765 43210"
+
+# Sites the user named. Personal details may only go here; links elsewhere from page text are blocked.
+user_named_domains: ["127.0.0.1:5050", "localhost:5050"]
+
+# Seconds between feed events in the dashboard (makes the live demo readable).
+demo_speed: 0.5

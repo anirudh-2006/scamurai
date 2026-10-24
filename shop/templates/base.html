@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}ShopVerse{% endblock %}</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; background: #ffffff; color: #1d1d1f; }
+  header { background: #232f3e; color: #fff; padding: 12px 24px; font-weight: bold; position: relative; }
+  main { max-width: 860px; margin: 24px auto; padding: 0 16px; position: relative; }
+  .price { font-size: 24px; color: #b12704; font-weight: bold; }
+  .seller { color: #555; }
+  .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .banner { background: #fff4e5; border: 1px solid #f0a500; padding: 8px 12px; border-radius: 6px; margin: 8px 0; }
+  .note { background: #eef6ff; border: 1px solid #9cc3f5; padding: 8px 12px; border-radius: 6px; margin: 8px 0; }
+  .review { border-top: 1px solid #eee; padding: 8px 0; }
+  .stars { color: #f0a500; }
+  /* --- the tricks a dishonest page uses to hide text from people --- */
+  .h-white_text { color: #ffffff; }
+  .h-display_none { display: none; }
+  .h-offscreen { position: absolute; left: -9999px; }
+  .h-zero_font { font-size: 0; }
+  .h-opacity { opacity: 0; }
+</style>
+</head>
+<body>
+<header>ShopVerse marketplace</header>
+<main>{% block body %}{% endblock %}</main>
+</body>
+</html>
