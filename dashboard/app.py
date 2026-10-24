@@ -227,10 +227,10 @@ with tab_report:
 
 # ---------------------------------------------------------------- scoreboard
 with tab_score:
-    from eval.scoreboard import DEMO_NOTE, RESULTS, chart, table
+    from eval.scoreboard import DEMO_NOTE, RESULTS, chart, memory_note, table
 
     if st.button("Run every setup against every task"):
-        with st.spinner("Running 5 setups x 8 tasks..."):
+        with st.spinner("Running 5 setups x 8 tasks, plus the memory second pass..."):
             import subprocess
 
             subprocess.run([sys.executable, "-m", "eval.run_tests"], cwd=ROOT, check=True)
@@ -238,7 +238,8 @@ with tab_score:
         res = json.loads(RESULTS.read_text())
         st.dataframe(table(res), hide_index=True, use_container_width=True)
         st.pyplot(chart(res))
-        st.caption(f"Brain: {res['backend']}. Numbers come from data/results.json.  \n{DEMO_NOTE}")
+        st.caption(f"Brain: {res['backend']}. Numbers come from data/results.json.  \n"
+                   + (f"{memory_note(res)}  \n" if memory_note(res) else "") + DEMO_NOTE)
     else:
         st.info("No results yet. Press the button above.")
 

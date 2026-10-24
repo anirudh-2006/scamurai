@@ -10,7 +10,7 @@ from core.config import ROOT
 RESULTS = ROOT / "data" / "results.json"
 
 # A4 decision, shown under the scoreboard.
-DEMO_NOTE = ("Live demo: deterministic naive agent (mock). Real model gpt-oss-20b (Groq): sent the address to partner-deals in 2 of 3 plain runs, 0 of 3 with Scamurai.")
+DEMO_NOTE = ("Mock naive agent. Real model gpt-oss-20b: address sent in 2 of 3 plain runs, 0 of 3 with Scamurai.")
 
 
 def table(out: dict) -> pd.DataFrame:
@@ -27,9 +27,21 @@ def table(out: dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def memory_note(out: dict) -> str:
+    """One line on what memory changed, for the memory row (which the table can't show)."""
+    mem = next((s for s in out["setups"] if s["setup"].startswith("+ Memory")), None)
+    full = next((s for s in out["setups"] if s["setup"].startswith("+ Decoys")), None)
+    if not mem or not full:
+        return ""
+    return (f"+ Memory (second pass): {mem['known_on_read']} known threats dropped on read; "
+            f"sessions frozen {mem['frozen_tasks']} of {len(mem['runs'])} (without memory: {full['frozen_tasks']}).")
+
+
 def print_table(out: dict) -> None:
     print(f"\nScoreboard (backend: {out['backend']})\n")
     print(table(out).to_string(index=False))
+    if note := memory_note(out):
+        print(f"\n{note}")
     print(f"\n{DEMO_NOTE}")
 
 

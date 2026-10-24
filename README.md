@@ -13,7 +13,7 @@ playwright install chromium            # once
 python -m pytest -q                    # 10 firewall tests
 python -m demo.run_demo                # terminal demo: plain agent vs Scamurai on the phone task
 python -m demo.run_demo --task earbuds --all-setups
-python -m eval.run_tests --fresh       # scoreboard: 5 setups x 8 tasks -> data/results.json
+python -m eval.run_tests --fresh       # scoreboard: 5 setups x 8 tasks + memory second pass -> data/results.json
 streamlit run dashboard/app.py         # the dashboard used for the live demo
 ```
 
@@ -31,19 +31,29 @@ The shop starts on its own (http://127.0.0.1:5050) when any of these run. To bro
 | `openai` | Any OpenAI-compatible endpoint: OpenAI, Groq, local Ollama (`openai_base_url`) | Real-agent runs, offline with Ollama |
 
 LLM answers are cached in `data/llm_cache/`, so a demo run replays identically. The real-LLM loop is
-in `agent/shopper.py::run_llm`. It was tested here only with a scripted fake LLM, since no API key was
-available. **Run it with a real model before the event** and tune the bait until the plain agent
-reliably falls for it.
+in `agent/shopper.py::run_llm`; every real run saves its full message list to `data/transcripts/`.
+We ran it with `openai/gpt-oss-20b` on Groq: on the phone task the plain agent sent the address to
+partner-deals in 2 of 3 runs but never picked Nova X5, so the live demo uses `mock` (see `config.yaml`).
 
-## What the prototype shows (mock brain, 8 tasks, 18 pages)
+## What the prototype shows (brain: `mock`, 8 tasks, 19 pages)
 
-| Setup | Fooled (of 4) | Hijacked (of 7) | Legit actions wrongly stopped (of 50) |
-|---|---|---|---|
-| Plain agent | 4 | 7 | 0 |
-| + Two views | 1 | 4 | 0 |
-| + Source labels | 0 | 1 | 0 |
-| + Firewall and voters | 0 | 0 | 0 |
-| + Decoys | 0 | 0 | 0 |
+From `python -m eval.run_tests --fresh`:
+
+| Setup | Fooled (of 5) | Hijacked (of 8) | Legit actions wrongly stopped | Caught only by voters |
+|---|---|---|---|---|
+| Plain agent | 5 | 8 | 0 of 50 | 0 |
+| + Two views | 2 | 5 | 0 of 50 | 0 |
+| + Source labels | 1 | 2 | 0 of 50 | 0 |
+| + Firewall and voters | 0 | 0 | 0 of 52 | 1 |
+| + Decoys (full Scamurai) | 0 | 0 | 0 of 52 | 1 |
+| + Memory (second pass) | 0 | 0 | 0 of 52 | 1 |
+
+- **Caught only by voters:** bait the voters rejected where every key detail came from you or a tool, so
+  source labels could never catch it. The one case: LiteCell 10K charges at 10 W, the goal asks for at
+  least 20 W. Seller upsells the voters also reject aren't counted (source labels stop those anyway).
+- **+ Memory (second pass):** full Scamurai, each task twice with a throwaway memory DB, scoring the
+  second pass. 11 known threats are dropped on read, and 0 of 8 sessions freeze (2 without memory).
+- Real model, for comparison: gpt-oss-20b (Groq) sent the address in 2 of 3 plain runs, 0 of 3 with Scamurai.
 
 These are numbers for a mock agent on a test shop we wrote ourselves. They prove the plumbing works,
 not that Scamurai beats real attackers.
